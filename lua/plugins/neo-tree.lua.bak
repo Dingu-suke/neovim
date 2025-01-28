@@ -1,0 +1,48 @@
+return {
+  "nvim-neo-tree/neo-tree.nvim",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "nvim-tree/nvim-web-devicons",
+    "MunifTanjim/nui.nvim",
+  },
+  config = function()  
+    require("neo-tree").setup({
+      filesystem = {
+        window = {
+          mappings = {
+            ["p"] = "toggle_preview",
+            ["<bs>"] = "navigate_up",  -- バックスペースの動作を変更
+          },
+          position = "left",
+          width = 30,
+        },
+        filtered_items = {
+          visible = false,
+          show_hidden = true,
+        },
+        default_component_configs = {  -- ここを追加
+          window = {
+            preview_shown = true,     -- 初期状態でプレビュー表示
+          }
+        },
+        filtered_items = {
+          visible = false,
+          show_hidden = true,
+        },
+        -- ルートディレクトリを制限
+        never_show_by_pattern = {
+          "/..", -- 親ディレクトリを表示しない
+        },
+      },
+    })
+
+    -- 起動時の設定
+    vim.api.nvim_create_autocmd("VimEnter", {
+      callback = function()
+        -- Neotreeを開いてフォーカス
+        vim.cmd("Neotree focus")
+        -- プレビューを有効化
+      end
+    })
+  end
+}

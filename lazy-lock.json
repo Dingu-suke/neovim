@@ -1,0 +1,13 @@
+{
+  "hererocks": { "branch": "master", "commit": "c9c5444dea1e07e005484014a8231aa667be30b6" },
+  "hlchunk.nvim": { "branch": "main", "commit": "5465dd33ade8676d63f6e8493252283060cd72ca" },
+  "image.nvim": { "branch": "master", "commit": "6ffafab2e98b5bda46bf227055aa84b90add8cdc" },
+  "lazy.nvim": { "branch": "main", "commit": "d8f26efd456190241afd1b0f5235fe6fdba13d4a" },
+  "nvim-tree-preview.lua": { "branch": "main", "commit": "aa87bc2367430b6f0254238cd89014db3a5f0116" },
+  "nvim-tree.lua": { "branch": "master", "commit": "fee1da88972f5972a8296813f6c00d7598325ebd" },
+  "nvim-treesitter": { "branch": "master", "commit": "f3d7c0dafcbc86c4d63f765649c884a03bc1360a" },
+  "plenary.nvim": { "branch": "master", "commit": "3707cdb1e43f5cea73afb6037e6494e7ce847a66" },
+  "telescope-file-browser.nvim": { "branch": "master", "commit": "626998e5c1b71c130d8bc6cf7abb6709b98287bb" },
+  "telescope.nvim": { "branch": "master", "commit": "415af52339215926d705cccc08145f3782c4d132" },
+  "tokyonight.nvim": { "branch": "main", "commit": "c3ab53c3f544e4a04f2a05d43451fd9bedff51b4" }
+}
