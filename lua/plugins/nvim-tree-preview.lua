@@ -9,6 +9,18 @@ return {
       },
     },
   },
+  -- ToggleNvimtree = function()
+  --   if vim.fn.bufname():match 'NvimTree_' then
+  --       vim.cmd.wincmd 'n'
+  --   else
+  --       vim.cmd('NvimTreeFindFile')
+  --   end
+  -- end
+
+  -- -- Which-Key
+  -- e  = { "<cmd>:lua toggle_nvimtree()<CR>", "Explorer Focus Toggle without closing" }
+  -- r  = { "<cmd>:lua require('nvim-tree.api').tree.toggle(false, true)<CR>", "Explorer Peek" }
+  
   config = function()
     vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', {silent = true, noremap = true})    
     vim.keymap.set('n', '<C-m>', ':NvimTreeFindFile<CR>', {silent = true, noremap = true})  -- .key を .set に修正
@@ -22,10 +34,6 @@ return {
       on_attach = function(bufnr)
         -- 起動時に自動で開く
         local api = require('nvim-tree.api')
-    
-        -- Important: When you supply an `on_attach` function, nvim-tree won't
-        -- automatically set up the default keymaps. To set up the default keymaps,
-        -- call the `default_on_attach` function. See `:help nvim-tree-quickstart-custom-mappings`.
         api.config.mappings.default_on_attach(bufnr)
     
         local function opts(desc)
@@ -34,7 +42,7 @@ return {
     
         local preview = require('nvim-tree-preview')
     
-        vim.keymap.set('n', 'P', preview.watch, opts 'Preview (Watch)')
+        vim.keymap.set('n', 'p', preview.watch, opts 'Preview (Watch)')
         vim.keymap.set('n', '<Esc>', preview.unwatch, opts 'Close Preview/Unwatch')
         vim.keymap.set('n', '<C-f>', function() return preview.scroll(4) end, opts 'Scroll Down')
         vim.keymap.set('n', '<C-b>', function() return preview.scroll(-4) end, opts 'Scroll Up')
