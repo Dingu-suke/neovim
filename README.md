@@ -20,6 +20,7 @@ vim.cmd[[
  set number               
  set relativenumber       
 ]]
+```
 
 ## Git 関連
 - [ ] LazyGit インテグレーション
