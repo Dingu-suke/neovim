@@ -1,5 +1,26 @@
 # 追加予定の機能
 
+## 表示・UI関連
+- [ ] 行数表示
+ - 組み込み機能: `set number` または `set number relativenumber`（相対的な行数表示）
+ - プラグイン候補:
+   - [numbers.vim](https://github.com/myusuf3/numbers.vim)
+     - 行数とrelative行数の賢い切り替え
+   - [vim-numbertoggle](https://github.com/jeffkreeftmeijer/vim-numbertoggle)
+     - モードに応じて自動的に行数表示を切り替え
+
+### 設定サンプル
+```lua
+-- 基本的な行数表示（組み込み機能を使用する場合）
+vim.wo.number = true                -- 行数を表示
+vim.wo.relativenumber = true        -- 相対的な行数を表示
+
+-- または
+vim.cmd[[
+ set number               
+ set relativenumber       
+]]
+
 ## Git 関連
 - [ ] LazyGit インテグレーション
   - プラグイン候補: [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim)
