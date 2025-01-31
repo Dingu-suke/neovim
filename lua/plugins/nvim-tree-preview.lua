@@ -9,18 +9,6 @@ return {
       },
     },
   },
-  -- ToggleNvimtree = function()
-  --   if vim.fn.bufname():match 'NvimTree_' then
-  --       vim.cmd.wincmd 'n'
-  --   else
-  --       vim.cmd('NvimTreeFindFile')
-  --   end
-  -- end
-
-  -- -- Which-Key
-  -- e  = { "<cmd>:lua toggle_nvimtree()<CR>", "Explorer Focus Toggle without closing" }
-  -- r  = { "<cmd>:lua require('nvim-tree.api').tree.toggle(false, true)<CR>", "Explorer Peek" }
-  
   config = function()
     vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', {silent = true, noremap = true})    
     vim.keymap.set('n', '<C-m>', ':NvimTreeFindFile<CR>', {silent = true, noremap = true})  -- .key を .set に修正
@@ -58,10 +46,17 @@ return {
             end
           end
         end, opts 'Preview')
-    
-        -- Option B: Simple tab behavior: Always preview
-        -- vim.keymap.set('n', '<Tab>', preview.node_under_cursor, opts 'Preview')
       end,
+      
+      vim.keymap.set('n', '<BS>', function()
+        -- まずツリーにフォーカスを移す
+        vim.cmd('NvimTreeFocus')
+        -- 少し待ってからプレビューを実行
+        vim.defer_fn(function()
+            local preview = require('nvim-tree-preview')
+            preview.watch()
+        end, 10)  -- 10ミリ秒の遅延
+      end, {silent = true, noremap = true})
     }
   end
 }
