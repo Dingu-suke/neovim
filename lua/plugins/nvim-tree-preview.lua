@@ -1,13 +1,7 @@
 return {
   'kyazdani42/nvim-tree.lua',
   dependencies = {
-    {
-      'b0o/nvim-tree-preview.lua',
-      dependencies = {
-        'nvim-lua/plenary.nvim',
-        '3rd/image.nvim', -- Optional, for previewing images
-      },
-    },
+    'nvim-tree/nvim-web-devicons',
   },
   config = function()
     vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', {silent = true, noremap = true})    
@@ -18,7 +12,16 @@ return {
       end
     })
     require('nvim-tree').setup {
-
+      renderer = {
+        highlight_git = true,
+        highlight_opened_files = "all",
+        highlight_modified = "all",
+      },
+      view = {
+        float = {
+          enable = false,
+        },
+      },
       on_attach = function(bufnr)
         -- 起動時に自動で開く
         local api = require('nvim-tree.api')
@@ -47,16 +50,28 @@ return {
           end
         end, opts 'Preview')
       end,
-      
-      vim.keymap.set('n', '<BS>', function()
-        -- まずツリーにフォーカスを移す
-        vim.cmd('NvimTreeFocus')
-        -- 少し待ってからプレビューを実行
-        vim.defer_fn(function()
-            local preview = require('nvim-tree-preview')
-            preview.watch()
-        end, 10)  -- 10ミリ秒の遅延
-      end, {silent = true, noremap = true})
     }
+
+    -- nvim-tree の背景を透明に設定
+    vim.api.nvim_set_hl(0, 'NvimTreeNormal', { bg = 'NONE' })
+    vim.api.nvim_set_hl(0, 'NvimTreeNormalNC', { bg = 'NONE' })
+    vim.api.nvim_set_hl(0, 'NvimTreeEndOfBuffer', { bg = 'NONE' })
+    vim.api.nvim_set_hl(0, 'NvimTreeWinSeparator', { bg = 'NONE' })
+
+    vim.keymap.set('n', '<BS>', function()
+      -- まずツリーにフォーカスを移す
+      vim.cmd('NvimTreeFocus')
+      -- 少し待ってからプレビューを実行
+      vim.defer_fn(function()
+          local preview = require('nvim-tree-preview')
+          preview.watch()
+      end, 10)  -- 10ミリ秒の遅延
+    end, {silent = true, noremap = true})
+
+    -- ツリーゾーンから Telescope を起動（バッファゾーンに移動）
+    vim.keymap.set('n', '<space>lf', function()
+      vim.api.nvim_command('wincmd l')
+      vim.api.nvim_command('Telescope file_browser path=%:p:h select_buffer=true')
+    end, {silent = true, noremap = true})
   end
 }

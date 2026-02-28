@@ -20,11 +20,17 @@ return {
     require("telescope").load_extension("file_browser")
     
     -- キーマップ設定
+    -- バッファゾーンに切り替えてから Telescope を起動
     vim.keymap.set(
       "n", 
-      "<space>fb", 
-      ":Telescope file_browser path=%:p:h select_buffer=true<CR>", 
-      { noremap = true }
+      "<space>lf",
+      function()
+        -- ツリーゾーンからバッファゾーンに移動
+        vim.api.nvim_command("wincmd l")
+        -- Telescope を起動
+        vim.api.nvim_command("Telescope file_browser path=%:p:h select_buffer=true")
+      end,
+      { noremap = true, silent = true }
     )
   end
 }
