@@ -50,9 +50,5 @@ return {
       callback = apply_custom_hl
     })
 
-    -- buffer 移動・ウィンドウ変更時にも再適用
-    vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
-      callback = apply_custom_hl
-    })
   end
 }

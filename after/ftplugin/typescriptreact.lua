@@ -1,4 +1,4 @@
--- ~/.config/nvim/after/ftplugin/typescript.lua
+-- ~/.config/nvim/after/ftplugin/typescriptreact.lua
 vim.bo.expandtab = true
 vim.bo.tabstop = 2
 vim.bo.shiftwidth = 2
