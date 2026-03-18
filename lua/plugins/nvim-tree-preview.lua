@@ -11,6 +11,7 @@ return {
         require("nvim-tree.api").tree.open()
       end
     })
+
     require('nvim-tree').setup {
       renderer = {
         highlight_git = true,
@@ -52,12 +53,6 @@ return {
       end,
     }
 
-    -- nvim-tree の背景を透明に設定
-    vim.api.nvim_set_hl(0, 'NvimTreeNormal', { bg = 'NONE' })
-    vim.api.nvim_set_hl(0, 'NvimTreeNormalNC', { bg = 'NONE' })
-    vim.api.nvim_set_hl(0, 'NvimTreeEndOfBuffer', { bg = 'NONE' })
-    vim.api.nvim_set_hl(0, 'NvimTreeWinSeparator', { bg = 'NONE' })
-
     vim.keymap.set('n', '<BS>', function()
       -- まずツリーにフォーカスを移す
       vim.cmd('NvimTreeFocus')
@@ -67,6 +62,34 @@ return {
           preview.watch()
       end, 10)  -- 10ミリ秒の遅延
     end, {silent = true, noremap = true})
+
+    -- NvimTree + バッファだけの状態ならどちらから :q しても終了
+    vim.api.nvim_create_autocmd("QuitPre", {
+      callback = function()
+        local tree_wins = {}
+        local floating_wins = {}
+        local wins = vim.api.nvim_list_wins()
+        for _, w in ipairs(wins) do
+          local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(w))
+          if bufname:match("NvimTree_") ~= nil then
+            table.insert(tree_wins, w)
+          end
+          if vim.api.nvim_win_get_config(w).relative ~= '' then
+            table.insert(floating_wins, w)
+          end
+        end
+        local normal_wins = #wins - #floating_wins - #tree_wins
+        if normal_wins <= 1 then
+          local cur_win = vim.api.nvim_get_current_win()
+          for _, w in ipairs(wins) do
+            if w ~= cur_win and vim.api.nvim_win_get_config(w).relative == '' then
+              local is_tree = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(w)):match("NvimTree_") ~= nil
+              pcall(vim.api.nvim_win_close, w, is_tree)
+            end
+          end
+        end
+      end
+    })
 
     -- ツリーゾーンから Telescope を起動（バッファゾーンに移動）
     vim.keymap.set('n', '<space>lf', function()
