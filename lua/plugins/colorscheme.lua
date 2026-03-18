@@ -32,16 +32,27 @@ return {
       end
     end
     
-    set_transparent_bg()
-    
-    -- colorscheme 変更時に透明設定を再適用
+    -- 行番号の視認性向上
+    local function set_line_nr_hl()
+      vim.api.nvim_set_hl(0, "LineNr", { fg = "#e6e6e6", bg = "NONE" })
+      vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#ff9e64", bg = "NONE", bold = true })
+    end
+
+    local function apply_custom_hl()
+      set_transparent_bg()
+      set_line_nr_hl()
+    end
+
+    apply_custom_hl()
+
+    -- colorscheme 変更時に再適用
     vim.api.nvim_create_autocmd("ColorScheme", {
-      callback = set_transparent_bg
+      callback = apply_custom_hl
     })
-    
+
     -- buffer 移動・ウィンドウ変更時にも再適用
     vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
-      callback = set_transparent_bg
+      callback = apply_custom_hl
     })
   end
 }
