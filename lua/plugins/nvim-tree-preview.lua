@@ -54,14 +54,32 @@ return {
     }
 
     vim.keymap.set('n', '<BS>', function()
-      -- まずツリーにフォーカスを移す
       vim.cmd('NvimTreeFocus')
-      -- 少し待ってからプレビューを実行
-      vim.defer_fn(function()
-          local preview = require('nvim-tree-preview')
-          preview.watch()
-      end, 10)  -- 10ミリ秒の遅延
     end, {silent = true, noremap = true})
+
+    -- ツリーとバッファのアクティブ切り替え
+    vim.keymap.set('n', '<leader><CR>', function()
+      if vim.bo.filetype == 'NvimTree' then
+        vim.cmd('wincmd l')
+      else
+        vim.cmd('NvimTreeFocus')
+      end
+    end, {silent = true, noremap = true})
+
+    -- NvimTree 上で :w / :wq した場合、全バッファを保存する
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "NvimTree",
+      callback = function(args)
+        vim.bo[args.buf].buftype = "acwrite"
+        vim.api.nvim_create_autocmd("BufWriteCmd", {
+          buffer = args.buf,
+          callback = function()
+            vim.cmd("silent! wall")
+            vim.bo.modified = false
+          end,
+        })
+      end,
+    })
 
     -- NvimTree + バッファだけの状態ならどちらから :q しても終了
     vim.api.nvim_create_autocmd("QuitPre", {
