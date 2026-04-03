@@ -1,5 +1,5 @@
 return {
-  'kyazdani42/nvim-tree.lua',
+  'nvim-tree/nvim-tree.lua',
   dependencies = {
     'nvim-tree/nvim-web-devicons',
   },
@@ -13,10 +13,28 @@ return {
     })
 
     require('nvim-tree').setup {
+      update_focused_file = {
+        enable = true,
+        update_root = false,
+      },
       renderer = {
         highlight_git = true,
         highlight_opened_files = "all",
         highlight_modified = "all",
+        icons = {
+          git_placement = "after",
+          glyphs = {
+            git = {
+              unstaged  = "~",
+              staged    = "+",
+              unmerged  = "!",
+              renamed   = "R",
+              untracked = "?",
+              deleted   = "-",
+              ignored   = ".",
+            },
+          },
+        },
       },
       view = {
         float = {
