@@ -4,62 +4,57 @@ return {
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
     },
+    -- nvim 0.11+ の新 API (vim.lsp.config / vim.lsp.enable) を使用。
+    -- lspconfig はサーバごとのデフォルト設定 (lsp/*.lua) を提供するために残す。
     config = function()
-      -- LSPの設定
-      local lspconfig = require('lspconfig')
+      -- キーマッピングは LspAttach で一括設定（旧 on_attach 相当）
+      vim.api.nvim_create_autocmd('LspAttach', {
+        callback = function(args)
+          local bufnr = args.buf
+          local opts = { noremap = true, silent = true, buffer = bufnr }
 
-      -- キーマッピング関数
-      local on_attach = function(client, bufnr)
-        local opts = { noremap = true, silent = true, buffer = bufnr }
+          -- 定義ジャンプ
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+          -- 型定義ジャンプ
+          vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, opts)
+          -- 実装ジャンプ
+          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+          -- リファレンス検索
+          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+          -- ホバー情報表示
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+          -- リネーム
+          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+          -- コードアクション
+          vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+          -- 診断情報の表示
+          vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+          -- 前のエラーに移動
+          vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, opts)
+          -- 次のエラーに移動
+          vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end, opts)
 
-        -- 定義ジャンプ
-        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-        -- 型定義ジャンプ
-        vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, opts)
-        -- 実装ジャンプ
-        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-        -- リファレンス検索
-        vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-        -- ホバー情報表示
-        vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-        -- リネーム
-        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-        -- コードアクション
-        vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-        -- 診断情報の表示
-        vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
-        -- 前のエラーに移動
-        vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-        -- 次のエラーに移動
-        vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-      end
+          -- ESLint: 保存時に自動修正
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client.name == 'eslint' then
+            vim.api.nvim_create_autocmd('BufWritePre', {
+              buffer = bufnr,
+              command = 'EslintFixAll',
+            })
+          end
+        end,
+      })
 
-      -- LSPの機能を補完エンジンに連携するための設定
+      -- 補完エンジン連携の capabilities を全サーバ共通に適用
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
-      -- 言語サーバーの設定
-      -- Python
-      lspconfig.pyright.setup({
-        on_attach = on_attach,
+      vim.lsp.config('*', {
         capabilities = capabilities,
       })
 
-      -- Rust
-      lspconfig.rust_analyzer.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
-      -- Go
-      lspconfig.gopls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
+      -- サーバごとの追加設定（capabilities はマージされる）
 
       -- JavaScript/TypeScript (React/Next.js対応)
-      lspconfig.ts_ls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
+      vim.lsp.config('ts_ls', {
         settings = {
           typescript = {
             inlayHints = {
@@ -84,72 +79,30 @@ return {
         },
       })
 
-      -- ESLint
-      lspconfig.eslint.setup({
-        on_attach = function(client, bufnr)
-          on_attach(client, bufnr)
-          -- ESLintの自動修正を有効化
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            buffer = bufnr,
-            command = "EslintFixAll",
-          })
-        end,
-        capabilities = capabilities,
-        -- React/Next.jsプロジェクトでよく使用される設定
+      -- ESLint (React/Next.jsプロジェクト向け)
+      vim.lsp.config('eslint', {
         settings = {
           workingDirectory = { mode = 'auto' },
         },
       })
 
-      -- PHP
-      lspconfig.intelephense.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
       -- Ruby/Rails
-      lspconfig.solargraph.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
+      vim.lsp.config('solargraph', {
         settings = {
           solargraph = {
             diagnostics = true,
-            -- Railsの補完を有効化
             completion = true,
-            -- Railsフレームワークのサポートを有効化
             useBundler = true,
           },
         },
       })
 
-      -- 新しいRuby LSP (Ruby/Railsの補完強化)
-      lspconfig.ruby_lsp.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
-      -- CSS
-      lspconfig.cssls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
-      -- HTML
-      lspconfig.html.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
       -- Tailwind CSS (React/Next.jsでよく使用)
-      lspconfig.tailwindcss.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        -- Next.js/Reactでの設定
+      vim.lsp.config('tailwindcss', {
         settings = {
           tailwindCSS = {
             experimental = {
               classRegex = {
-                -- JSX/TSXでのTailwindクラス検出を強化
                 'className="([^"]*)"',
                 'tw="([^"]*)"',
                 'tw\\.[^`]+`([^`]*)`',
@@ -159,22 +112,22 @@ return {
         },
       })
 
-      -- C/C++
-      lspconfig.clangd.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
-      -- C#
-      lspconfig.omnisharp.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-
-      -- Java
-      lspconfig.jdtls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
+      -- 有効化する言語サーバ一覧
+      vim.lsp.enable({
+        'pyright',       -- Python
+        'rust_analyzer', -- Rust
+        'gopls',         -- Go
+        'ts_ls',         -- JavaScript/TypeScript
+        'eslint',        -- ESLint
+        'intelephense',  -- PHP
+        'solargraph',    -- Ruby/Rails
+        'ruby_lsp',      -- Ruby LSP
+        'cssls',         -- CSS
+        'html',          -- HTML
+        'tailwindcss',   -- Tailwind CSS
+        'clangd',        -- C/C++
+        'omnisharp',     -- C#
+        'jdtls',         -- Java
       })
 
       -- 診断表示のカスタマイズ
