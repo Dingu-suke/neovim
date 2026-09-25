@@ -4,8 +4,7 @@ return {
     'nvim-tree/nvim-web-devicons',
   },
   config = function()
-    vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', {silent = true, noremap = true})    
-    vim.keymap.set('n', '<C-m>', ':NvimTreeFindFile<CR>', {silent = true, noremap = true})  -- .key を .set に修正
+    vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', {silent = true, noremap = true})
     vim.api.nvim_create_autocmd("VimEnter", {
       callback = function()
         require("nvim-tree.api").tree.open()
